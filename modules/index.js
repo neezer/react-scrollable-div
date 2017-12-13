@@ -5,10 +5,10 @@ import get from './style'
 
 class Outer extends React.Component {
   render () {
-    const { children, measureRef, dimensions = {} } = this.props
+    const { children, dimensions = {} } = this.props
     const styles = get.outer.style(dimensions)
 
-    return <div ref={measureRef} style={styles}>{children}</div>
+    return <div style={styles}>{children}</div>
   }
 }
 
@@ -84,15 +84,15 @@ export default class ScrollableDiv extends React.Component {
 
     this.state = {}
 
-    this.outerRef = node => (this.outerRef = node)
-    this.fixedRef = node => (this.fixedRef = node)
+    this.contentRef = node => (this.contentNode = node)
+    this.fixedRef = node => (this.fixedNode = node)
   }
 
   componentDidMount () {
     this.setState({
       dimensions: getDimensions({
-        outer: this.outerRef,
-        fixed: this.fixedRef,
+        content: this.contentNode,
+        fixed: this.fixedNode,
         gutterWidth: this.props.gutterWidth
       })
     })
@@ -103,12 +103,12 @@ export default class ScrollableDiv extends React.Component {
     const { dimensions } = this.state
 
     return (
-      <Outer measureRef={this.outerRef} dimensions={dimensions}>
+      <Outer dimensions={dimensions}>
         <InnerX dimensions={dimensions}>
           <FixedContent fixedRef={this.fixedRef} />
           <InnerYWrapper dimensions={dimensions}>
             <InnerY dimensions={dimensions}>
-              <Content />
+              <Content contentRef={this.contentRef} />
             </InnerY>
           </InnerYWrapper>
         </InnerX>

@@ -27,7 +27,8 @@ export default {
     style: ({ scrollBarX }) => ({
       position: 'relative',
       height: tryToPx(scrollBarX, ['height']),
-      width: tryToPx(scrollBarX, ['width'])
+      width: tryToPx(scrollBarX, ['width']),
+      display: maybe(v => (v ? 'none' : null), scrollBarX, ['maxed'])
     }),
     handle: {}
   },
@@ -35,14 +36,16 @@ export default {
     style: ({ scrollBarY }) => ({
       position: 'relative',
       height: tryToPx(scrollBarY, ['height']),
-      width: tryToPx(scrollBarY, ['width'])
+      width: tryToPx(scrollBarY, ['width']),
+      display: maybe(v => (v ? 'none' : null), scrollBarY, ['maxed'])
     }),
     handle: {}
   },
   innerYWrapper: {
-    style: ({ content }) => ({
+    style: ({ innerYWrapper }) => ({
       overflow: 'hidden',
-      width: tryToPx(content, ['width'])
+      width: tryToPx(innerYWrapper, ['width']),
+      height: tryToPx(innerYWrapper, ['height'])
     })
   },
   innerY: {
@@ -66,14 +69,10 @@ export default {
       height: tryToPx(scrollerY, ['height'])
     })
   }
+}
 
-  // if (xScrollMaxed) {
-  //   styles.innerX.scroll.bar.style.display = 'none'
-  // }
-
-  // if (yScrollMaxed) {
-  //   styles.innerY.scroll.bar.style.display = 'none'
-  // }
+function ident (value) {
+  return value
 }
 
 function toPx (value) {
@@ -84,9 +83,28 @@ function negate (value) {
   return value * -1
 }
 
-function maybe (fn) {
-  return (value, segments) =>
+function curry (fx) {
+  var arity = fx.length
+
+  return function f1 () {
+    var args = Array.prototype.slice.call(arguments, 0)
+
+    if (args.length >= arity) {
+      return fx.apply(null, args)
+    } else {
+      return function f2 () {
+        var args2 = Array.prototype.slice.call(arguments, 0)
+
+        return f1.apply(null, args.concat(args2))
+      }
+    }
+  }
+}
+
+function maybe (...args) {
+  return curry((fn, value, segments) =>
     compose(ifElse(v => v === null, () => null, fn), path(segments))(value)
+  )(...args)
 }
 
 function ifElse (cond, ifFn, elseFn) {
