@@ -1,9 +1,6 @@
 const tryToPx = maybe(toPx)
 
 export default {
-  // const xScrollMaxed = scrollBar.x.width === scroller.x.width
-  // const yScrollMaxed = scrollBar.y.height === scroller.y.height
-
   outer: {
     style: ({ outer }) => ({
       overflow: 'hidden',
@@ -17,6 +14,7 @@ export default {
   innerX: {
     style: ({ innerX }) => ({
       overflowX: 'scroll',
+      overflowY: 'hidden',
       paddingBottom: toPx(40),
       marginBottom: compose(toPx, negate)(40),
       width: tryToPx(innerX, ['width']),
@@ -59,20 +57,18 @@ export default {
   },
   scrollerX: {
     style: ({ scrollerX }) => ({
+      position: 'relative',
       width: tryToPx(scrollerX, ['width']),
       height: tryToPx(scrollerX, ['height'])
     })
   },
   scrollerY: {
     style: ({ scrollerY }) => ({
+      position: 'relative',
       width: tryToPx(scrollerY, ['width']),
       height: tryToPx(scrollerY, ['height'])
     })
   }
-}
-
-function ident (value) {
-  return value
 }
 
 function toPx (value) {

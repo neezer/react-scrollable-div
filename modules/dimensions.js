@@ -1,19 +1,20 @@
-export default ({ content, fixed, gutterWidth }) => {
+export default ({ outer, content, fixed, gutterWidth }) => {
   const viewport = {
     width: window.innerWidth,
     height: window.innerHeight
   }
 
+  const outerBox = outer.getBoundingClientRect()
   const box = content.getBoundingClientRect()
   const fixedBox = fixed.getBoundingClientRect()
 
-  const width = viewport.width < box.left + box.width
-    ? viewport.width - box.left
-    : box.width
+  const width = viewport.width < outerBox.left + outerBox.width
+    ? viewport.width - outerBox.left
+    : outerBox.width
 
-  const height = viewport.height < box.top + box.height
-    ? viewport.height - box.top
-    : box.height
+  const height = viewport.height < outerBox.top + outerBox.height
+    ? viewport.height - outerBox.top
+    : outerBox.height
 
   let innerXWidth = width - gutterWidth
   let innerXHeight = height - gutterWidth
@@ -22,22 +23,37 @@ export default ({ content, fixed, gutterWidth }) => {
   let innerYHeight = innerXHeight - fixedBox.height
   let scrollBarYHeight = innerXHeight
 
-  const scrollerXWidth = Math.min(width * (width / box.width), width)
-  const scrollerYHeight = Math.min(height * (height / box.height), height)
+  let scrollerXWidth = Math.min(
+    innerXWidth * (innerXWidth / box.width),
+    innerXWidth
+  )
+
+  let scrollerYHeight = Math.min(
+    innerXHeight * ((innerXHeight - fixedBox.height) / box.height),
+    height
+  )
 
   if (scrollerXWidth >= innerXWidth) {
     scrollBarXMaxed = true
     innerXHeight += gutterWidth
     scrollBarYHeight = innerXHeight
+
+    scrollerYHeight = Math.min(
+      innerXHeight * ((innerXHeight - fixedBox.height) / box.height),
+      height
+    )
   }
 
   if (scrollerYHeight >= scrollBarYHeight) {
     scrollBarYMaxed = true
     innerXWidth += gutterWidth
     innerYHeight += gutterWidth
-  }
 
-  console.log(box)
+    scrollerXWidth = Math.min(
+      innerXWidth * (innerXWidth / box.width),
+      innerXWidth
+    )
+  }
 
   return {
     content: { width: box.width, height: box.height },
